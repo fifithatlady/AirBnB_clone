@@ -7,8 +7,10 @@ Unittest classes:
     TestBaseModel_to_dict
 """
 import os
+import models
 import unittest
 from datetime import datetime
+from time import sleep
 from models.base_model import BaseModel
 
 class TestBaseModel_instantiation(unittest.TestCase):
@@ -76,7 +78,7 @@ class TestBaseModel_instantiation(unittest.TestCase):
         self.assertEqual(model.name, data['name'])
 
     def test_instantiation_with_None_kwargs(self):
-        model = BaseModel(**None)
+        model = BaseModel(**{})
         self.assertIsInstance(model, BaseModel)
 
     def test_instantiation_with_args_and_kwargs(self):
@@ -88,7 +90,7 @@ class TestBaseModel_instantiation(unittest.TestCase):
         model = BaseModel(42, **data)
         self.assertEqual(model.id, data['id'])
         self.assertEqual(model.created_at, datetime.strptime(data['created_at'], "%Y-%m-%dT%H:%M:%S.%f"))
-        self.assertEqual(model.name, data['name')
+        self.assertEqual(model.name, data['name'])
 
 class TestBaseModel_save(unittest.TestCase):
     """Unittests for testing save method of the BaseModel class."""
@@ -175,7 +177,10 @@ class TestBaseModel_to_dict(unittest.TestCase):
     def test_contrast_to_dict_dunder_dict(self):
         model = BaseModel()
         model_dict = model.to_dict()
-        self.assertEqual(model_dict, model.__dict__)
+        expected_model_dict = model.__dict__.copy()
+        expected_model_dict["created_at"] = expected_model_dict["created_at"].isoformat()
+        expected_model_dict["updated_at"] = expected_model_dict["updated_at"].isoformat()
+        self.assertEqual(model_dict, expected_model_dict)
 
     def test_to_dict_with_arg(self):
         model = BaseModel()
@@ -184,3 +189,4 @@ class TestBaseModel_to_dict(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
