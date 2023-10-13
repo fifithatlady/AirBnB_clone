@@ -37,10 +37,10 @@ class BaseModel:
         result = {**self.__dict__}
         result["created_at"] = self.created_at.isoformat()
         result["updated_at"] = self.updated_at.isoformat()
-        result["__class__"] = self.__class__.__name
+        result["__class__"] = self.__class__.__name__
         return result
 
     def __str__(self):
         """Return a string representation of the BaseModel instance."""
-        class_name = self.__class__.__name
+        class_name = self.__class__.__name__
         return "[{}] ({}) {}".format(class_name, self.id, self.__dict__)
