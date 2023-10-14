@@ -78,80 +78,94 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
 
     def do_show(self, arg):
-        """Usage: <class name>.show(<id>)
+        """Usage: show <class> <id> or <class>.show(<id>)
         Display the string representation of a class instance of a given id.
         """
-        parts = arg.split(".")
-        class_name = parts[0]
+        args = arg.split()
+        obj_dict = storage.all()
+        if len(args) < 2:
+            print("** class name missing **" if len(args) < 1 else "** instance id missing **")
+            return
+
+        class_name, instance_id = args[0], args[1]
+
         if class_name in self.class_map:
-            if len(parts) == 2:
-                instance_id = parts[1]
-                instance = self.class_map[class_name].show(instance_id)
-                if instance:
-                    print(instance)
-                else:
-                    print("** no instance found **")
+            instance = obj_dict.get(f"{class_name}.{instance_id}")
+            if instance:
+                print(instance)
             else:
-                print("** instance id missing **")
+                print("** no instance found **")
         else:
             print("** class doesn't exist **")
 
     def do_destroy(self, arg):
-        """Usage: <class name>.destroy(<id>)
+        """Usage: destroy <class> <id> or <class>.destroy(<id>)
         Delete a class instance of a given id.
         """
-        parts = arg.split(".")
-        class_name = parts[0]
+        args = arg.split()
+        obj_dict = storage.all()
+        if len(args) < 2:
+            print("** class name missing **" if len(args) < 1 else "** instance id missing **")
+            return
+
+        class_name, instance_id = args[0], args[1]
+
         if class_name in self.class_map:
-            if len(parts) == 2:
-                instance_id = parts[1]
-                result = self.class_map[class_name].destroy(instance_id)
-                if result:
-                    storage.save()
-                else:
-                    print("** no instance found **")
+            instance_key = f"{class_name}.{instance_id}"
+            if instance_key in obj_dict:
+                del obj_dict[instance_key]
+                storage.save()
             else:
-                print("** instance id missing **")
+                print("** no instance found **")
         else:
             print("** class doesn't exist **")
 
     def do_all(self, arg):
-        """Usage: <class name>.all()
+        """Usage: all or all <class> or <class>.all()
         Display string representations of all instances of a given class.
         If no class is specified, displays all instantiated objects.
         """
-        parts = arg.split(".")
-        if parts[0] in self.class_map:
-            class_name = parts[0]
-            instances = self.class_map[class_name].all()
-            obj_list = [str(instance) for instance in instances]
+        args = arg.split()
+        obj_dict = storage.all()
+
+        if len(args) == 0:
+            obj_list = [str(obj) for obj in obj_dict.values()]
             print(obj_list)
-        else:
-            obj_dict = storage.all()
-            if parts[0]:
-                print("** class doesn't exist **")
-            else:
-                obj_list = [str(obj) for obj in obj_dict.values()]
+        elif len(args) == 1:
+            class_name = args[0]
+            if class_name in self.class_map:
+                obj_list = [str(obj) for obj in obj_dict.values() if isinstance(obj, self.class_map[class_name])]
                 print(obj_list)
+            else:
+                print("** class doesn't exist **")
 
     def do_count(self, arg):
-        """Usage: <class name>.count()
+        """Usage: count <class> or <class>.count()
         Retrieve the number of instances of a given class.
         """
-        parts = arg.split(".")
-        class_name = parts[0]
-        if class_name in self.class_map:
-            count = self.class_map[class_name].count()
-            print(count)
-        else:
-            print("** class doesn't exist **")
+        args = arg.split()
+        obj_dict = storage.all()
+
+        if len(args) == 0:
+            print(len(obj_dict))
+        elif len(args) == 1:
+            class_name = args[0]
+            if class_name in self.class_map:
+                count = sum(1 for obj in obj_dict.values() if isinstance(obj, self.class_map[class_name]))
+                print(count)
+            else:
+                print("** class doesn't exist **")
 
     def do_update(self, arg):
-        """Usage: <class name>.update(<id>, <attribute name>, <attribute value>)
+        """Usage: update <class> <id> <attribute_name> <attribute_value> or
+       <class>.update(<id>, <attribute_name>, <attribute_value>) or
+       <class>.update(<id>, <dictionary>)
         Update a class instance of a given id by adding or updating
-        a given attribute key/value pair.
+        a given attribute key/value pair or dictionary.
         """
         args = arg.split()
+        obj_dict = storage.all()
+
         if len(args) < 3:
             print("** class name missing **" if len(args) < 1 else
                   "** instance id missing **" if len(args) < 2 else
@@ -159,37 +173,28 @@ class HBNBCommand(cmd.Cmd):
             return
 
         class_name, instance_id, attribute_name = args[0], args[1], args[2]
+        instance_key = f"{class_name}.{instance_id}"
+
         if class_name in self.class_map:
-            if len(args) < 4:
-                print("** value missing **")
+            if instance_key in obj_dict:
+                instance = obj_dict[instance_key]
+
+                if len(args) == 3:
+                    print("** value missing **")
+                    return
+
+                if len(args) == 4:
+                    attribute_value = args[3]
+                else:
+                    attribute_value = args[4]
+
+                setattr(instance, attribute_name, attribute_value)
+                instance.save()
             else:
-                attribute_value = args[3]
-                self.class_map[class_name].update(instance_id, attribute_name, attribute_value)
-                storage.save()
+                print("** no instance found **")
         else:
             print("** class doesn't exist **")
 
-    def do_update(self, arg):
-        """Usage: <class name>.update(<id>, <dictionary representation>)
-        Update a class instance of a given id with a dictionary representation.
-        """
-        parts = arg.split(".")
-        if len(parts) == 2 and parts[0] in self.class_map:
-            class_name, instance_id = parts[0], parts[1]
-            instance_key = f"{class_name}.{instance_id}"
-            obj_dict = storage.all()
-            if instance_key in obj_dict:
-                instance = obj_dict[instance_key]
-                if not isinstance(instance, BaseModel):
-                    return
-                if len(parts) == 2:
-                    try:
-                        instance_dict = eval(input("Enter a dictionary: "))
-                        if isinstance(instance_dict, dict):
-                            instance.update(instance_dict)
-                            storage.save()
-                    except:
-                        pass
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
