@@ -110,7 +110,7 @@ class HBNBCommand(cmd.Cmd):
 
         class_name, instance_id = args[0], args[1]
 
-        if class_name in self.class_map:
+        if class_name in this.class_map:
             instance_key = f"{class_name}.{instance_id}"
             if instance_key in obj_dict:
                 del obj_dict[instance_key]
@@ -129,13 +129,12 @@ class HBNBCommand(cmd.Cmd):
         obj_dict = storage.all()
 
         if len(args) == 0:
-            obj_list = [str(obj) for obj in obj_dict.values()]
-            print(obj_list)
+            print([str(obj) for obj in obj_dict.values()])
         elif len(args) == 1:
             class_name = args[0]
             if class_name in self.class_map:
-                obj_list = [str(obj) for obj in obj_dict.values() if isinstance(obj, self.class_map[class_name])]
-                print(obj_list)
+                instances = storage.all(self.class_map[class_name])
+                print([str(obj) for obj in instances])
             else:
                 print("** class doesn't exist **")
 
