@@ -2,13 +2,13 @@
 """Defines the HBnB console."""
 import cmd
 from models import storage
-from models.base_model import BaseModel
 from models.user import User
 from models.state import State
 from models.city import City
 from models.place import Place
-from models.amenity import Amenity
 from models.review import Review
+from models.amenity import Amenity
+from models.base_model import BaseModel
 
 
 class HBNBCommand(cmd.Cmd):
@@ -24,8 +24,8 @@ class HBNBCommand(cmd.Cmd):
         "State": State,
         "City": City,
         "Place": Place,
-        "Amenity": Amenity,
-        "Review": Review
+        "Review": Review,
+        "Amenity": Amenity
     }
 
     def emptyline(self):
@@ -34,22 +34,40 @@ class HBNBCommand(cmd.Cmd):
 
     def default(self, arg):
         """Default behavior for cmd module when input is invalid"""
-        arg_dict = {
-            "all": self.do_all,
-            "show": self.do_show,
-            "destroy": self.do_destroy,
-            "count": self.do_count,
-            "update": self.do_update
-        }
         split_args = arg.split(".")
-        if len(split_args) == 2 and split_args[0] in self.class_map:
+        if len(split_args) == 2:
             class_name = split_args[0]
             cmd = split_args[1]
-            if cmd in arg_dict:
-                return arg_dict[cmd](f"{class_name} {split_args[1]}")
 
-        print("*** Unknown syntax: {}".format(arg))
-        return False
+            if class_name in self.class_map:
+                if cmd == "all":
+                    self.do_all(class_name)
+                elif cmd == "count":
+                    self.do_count(class_name)
+                elif cmd.startswith("show(") and cmd.endswith(")"):
+                    instance_id = cmd.split("(")[1].split(")")[0]
+                    self.do_show(f"{class_name} {instance_id}")
+                elif cmd.startswith("destroy(") and cmd.endswith(")"):
+                    instance_id = cmd.split("(")[1].split(")")[0]
+                    self.do_destroy(f"{class_name} {instance_id}")
+                elif cmd.startswith("update(") and cmd.endswith(")"):
+                    update_args = cmd.split("(")[1].split(")")[0].split(",")
+                    if len(update_args) >= 2:
+                        instance_id = update_args[0].strip()
+                        attribute_name = update_args[1].strip()
+                        if len(update_args) >= 3:
+                            attribute_value = update_args[2].strip()
+                            self.do_update(f"{class_name} {instance_id} {attribute_name} {attribute_value}")
+                        else:
+                            self.do_update(f"{class_name} {instance_id} {attribute_name}")
+                    else:
+                        print("*** Unknown syntax: {}".format(arg))
+                else:
+                    print("*** Unknown syntax: {}".format(arg))
+            else:
+                print("*** Unknown syntax: {}".format(arg))
+        else:
+            print("*** Unknown syntax: {}".format(arg))
 
     def do_quit(self, arg):
         """Quit command to exit the program."""
@@ -90,7 +108,8 @@ class HBNBCommand(cmd.Cmd):
         class_name, instance_id = args[0], args[1]
 
         if class_name in self.class_map:
-            instance = obj_dict.get(f"{class_name}.{instance_id}")
+            instance_key = f"{class_name}.{instance_id}"
+            instance = obj_dict.get(instance_key)
             if instance:
                 print(instance)
             else:
@@ -134,7 +153,8 @@ class HBNBCommand(cmd.Cmd):
         elif len(args) == 1:
             class_name = args[0]
             if class_name in self.class_map:
-                obj_list = [str(obj) for obj in obj_dict.values() if isinstance(obj, self.class_map[class_name])]
+                obj_list = [str(obj) for obj in obj_dict.values()
+                        if isinstance(obj, self.class_map[class_name])]
                 print(obj_list)
             else:
                 print("** class doesn't exist **")
@@ -151,7 +171,8 @@ class HBNBCommand(cmd.Cmd):
         elif len(args) == 1:
             class_name = args[0]
             if class_name in self.class_map:
-                count = sum(1 for obj in obj_dict.values() if isinstance(obj, self.class_map[class_name]))
+                count = sum(1 for obj in obj_dict.values()
+                        if isinstance(obj, self.class_map[class_name]))
                 print(count)
             else:
                 print("** class doesn't exist **")
@@ -198,3 +219,4 @@ class HBNBCommand(cmd.Cmd):
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
+
