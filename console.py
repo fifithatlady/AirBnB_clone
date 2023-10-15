@@ -10,6 +10,7 @@ from models.review import Review
 from models.amenity import Amenity
 from models.base_model import BaseModel
 
+
 class HBNBCommand(cmd.Cmd):
     """Defines the HolbertonBnB command interpreter.
 
@@ -46,10 +47,10 @@ class HBNBCommand(cmd.Cmd):
                 elif cmd.startswith("show(") and cmd.endswith(")"):
                     instance_id = cmd.split("(")[1].split(")")[0]
                     self.do_show(f"{class_name} {instance_id}")
-                elif cmd.startswith("destroy(") and cmd ends with (")"):
+                elif cmd.startswith("destroy(") and cmd.endswith(")"):
                     instance_id = cmd.split("(")[1].split(")")[0]
                     self.do_destroy(f"{class_name} {instance_id}")
-                elif cmd.startswith("update(") and cmd ends with (")"):
+                elif cmd.startswith("update(") and cmd.endswith(")"):
                     update_args = cmd.split("(")[1].split(")")[0].split(",")
                     if len(update_args) >= 2:
                         instance_id = update_args[0].strip()
@@ -139,19 +140,21 @@ class HBNBCommand(cmd.Cmd):
             print("** class doesn't exist **")
 
     def do_all(self, arg):
-        """Usage: all User or User.all()
-        Display string representations of all User instances.
+        """Usage: all or all <class> or <class>.all()
+        Display string representations of all instances of a given class.
+        If no class is specified, displays all instantiated objects.
         """
         args = arg.split()
         obj_dict = storage.all()
 
         if len(args) == 0:
-            obj_list = [str(obj) for obj in obj_dict.values() if isinstance(obj, User)]
+            obj_list = [str(obj) for obj in obj_dict.values()]
             print(obj_list)
         elif len(args) == 1:
             class_name = args[0]
-            if class_name == "User":
-                obj_list = [str(obj) for obj in obj_dict.values() if isinstance(obj, User)]
+            if class_name in self.class_map:
+                obj_list = [str(obj) for obj in obj_dict.values()
+                        if isinstance(obj, self.class_map[class_name])]
                 print(obj_list)
             else:
                 print("** class doesn't exist **")
@@ -168,15 +171,16 @@ class HBNBCommand(cmd.Cmd):
         elif len(args) == 1:
             class_name = args[0]
             if class_name in self.class_map:
-                count = sum(1 for obj in obj_dict.values() if isinstance(obj, self.class_map[class_name]))
+                count = sum(1 for obj in obj_dict.values()
+                        if isinstance(obj, self.class_map[class_name]))
                 print(count)
             else:
                 print("** class doesn't exist **")
 
     def do_update(self, arg):
         """Usage: update <class> <id> <attribute_name> <attribute_value> or
-        <class>.update(<id>, <attribute_name>, <attribute_value>) or
-        <class>.update(<id>, <dictionary>)
+       <class>.update(<id>, <attribute_name>, <attribute_value>) or
+       <class>.update(<id>, <dictionary>)
         Update a class instance of a given id by adding or updating
         a given attribute key/value pair or dictionary.
         """
@@ -215,4 +219,3 @@ class HBNBCommand(cmd.Cmd):
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
-
