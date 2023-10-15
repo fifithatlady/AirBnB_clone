@@ -3,7 +3,7 @@
 from models.base_model import BaseModel
 
 class User(BaseModel):
-    """Represents a User.
+    """it Represent a User.
 
     Attributes:
         email (str): The email of the user.
