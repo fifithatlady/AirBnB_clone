@@ -3,7 +3,7 @@
 from models.base_model import BaseModel
 
 class User(BaseModel):
-    """it Represent a User.
+    """Represents a User.
 
     Attributes:
         email (str): The email of the user.
@@ -16,3 +16,15 @@ class User(BaseModel):
     password = ""
     first_name = ""
     last_name = ""
+
+    @classmethod
+    def all(cls):
+        """Retrieve all instances of the User class."""
+        from models import storage
+        return storage.all(User)
+
+    @classmethod
+    def count(cls):
+        """Count the number of instances of the User class."""
+        from models import storage
+        return len(storage.all(User))
