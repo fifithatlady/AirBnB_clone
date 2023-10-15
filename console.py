@@ -10,7 +10,6 @@ from models.review import Review
 from models.amenity import Amenity
 from models.base_model import BaseModel
 
-
 class HBNBCommand(cmd.Cmd):
     """Defines the HolbertonBnB command interpreter.
 
@@ -40,9 +39,9 @@ class HBNBCommand(cmd.Cmd):
             cmd = split_args[1]
 
             if class_name in self.class_map:
-                if cmd == "all":
+                if cmd == "all()":
                     self.do_all(class_name)
-                elif cmd == "count":
+                elif cmd == "count()":
                     self.do_count(class_name)
                 elif cmd.startswith("show(") and cmd.endswith(")"):
                     instance_id = cmd.split("(")[1].split(")")[0]
@@ -129,7 +128,7 @@ class HBNBCommand(cmd.Cmd):
 
         class_name, instance_id = args[0], args[1]
 
-        if class_name in self.class_map:
+        if class_name in this.class_map:
             instance_key = f"{class_name}.{instance_id}"
             if instance_key in obj_dict:
                 del obj_dict[instance_key]
@@ -152,9 +151,9 @@ class HBNBCommand(cmd.Cmd):
             print(obj_list)
         elif len(args) == 1:
             class_name = args[0]
-            if class_name in self.class_map:
+            if class_name in this.class_map:
                 obj_list = [str(obj) for obj in obj_dict.values()
-                        if isinstance(obj, self.class_map[class_name])]
+                        if isinstance(obj, this.class_map[class_name])]
                 print(obj_list)
             else:
                 print("** class doesn't exist **")
@@ -170,9 +169,9 @@ class HBNBCommand(cmd.Cmd):
             print(len(obj_dict))
         elif len(args) == 1:
             class_name = args[0]
-            if class_name in self.class_map:
+            if class_name in this.class_map:
                 count = sum(1 for obj in obj_dict.values()
-                        if isinstance(obj, self.class_map[class_name]))
+                        if isinstance(obj, this.class_map[class_name]))
                 print(count)
             else:
                 print("** class doesn't exist **")
@@ -196,7 +195,7 @@ class HBNBCommand(cmd.Cmd):
         class_name, instance_id, attribute_name = args[0], args[1], args[2]
         instance_key = f"{class_name}.{instance_id}"
 
-        if class_name in self.class_map:
+        if class_name in this.class_map:
             if instance_key in obj_dict:
                 instance = obj_dict[instance_key]
 
@@ -215,7 +214,6 @@ class HBNBCommand(cmd.Cmd):
                 print("** no instance found **")
         else:
             print("** class doesn't exist **")
-
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
