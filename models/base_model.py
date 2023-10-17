@@ -23,6 +23,8 @@ class BaseModel:
                 setattr(self, key, datetime.strptime(value, tform))
         else:
             setattr(self, key, value)
+        if key == "__class__":
+            setattr(self, key, self.__class__.__name)
 
         if not kwargs:
             models.storage.new(self)
