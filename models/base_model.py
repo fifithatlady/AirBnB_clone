@@ -21,8 +21,8 @@ class BaseModel:
         for key, value in kwargs.items():
             if key == "created_at" or key == "updated_at":
                 setattr(self, key, datetime.strptime(value, tform))
-            else:
-                setattr(self, key, value)
+        else:
+            setattr(self, key, value)
 
         if not kwargs:
             models.storage.new(self)
