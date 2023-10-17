@@ -19,12 +19,10 @@ class BaseModel:
         tform = "%Y-%m-%dT%H:%M:%S.%f"
 
         for key, value in kwargs.items():
-            if key == "created_at" or key == "updated_at":
-                setattr(self, key, datetime.strptime(value, tform))
-        else:
-            setattr(self, key, value)
-        if key == "__class__":
-            setattr(self, key, self.__class__.__name)
+            if key in ["created_at", "updated_at"]:
+                self.__dict__[key] = datetime.strptime(value, tform)
+            else:
+                self.__dict__[key] = value
 
         if not kwargs:
             models.storage.new(self)
