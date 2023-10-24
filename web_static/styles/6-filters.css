@@ -1,0 +1,69 @@
+/* Filters Styles */
+.popover {
+    display: none;
+    background-color: #FAFAFA;
+    border: 1px solid #DDDDDD;
+    border-radius: 4px;
+    position: absolute;
+    width: 100%;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.filters .locations:hover .popover,
+.filters .amenities:hover .popover {
+    display: block;
+}
+
+.filters {
+    display: flex;
+    justify-content: space-between;
+}
+
+.filter {
+    width: 25%;
+    text-align: center;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.locations {
+    background-color: #f0f0f0;
+}
+
+.amenities {
+    background-color: #e0e0e0;
+}
+
+.filter h3 {
+    font-weight: 600;
+}
+
+.filter h4 {
+    font-weight: 400;
+    font-size: 14px;
+}
+
+.search-button {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* Styles for the dropdown */
+.popover li {
+    padding: 5px;
+    border-bottom: 1px solid #DDDDDD;
+}
+
+.popover h2 {
+    font-size: 16px;
+    margin: 0;
+    padding: 5px;
+    border-bottom: 1px solid #DDDDDD;
+}
+
